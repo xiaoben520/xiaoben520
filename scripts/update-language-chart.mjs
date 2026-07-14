@@ -7,66 +7,36 @@ const username = process.env.GITHUB_USERNAME || "xiaoben520";
 const token = process.env.GITHUB_TOKEN;
 const outputPath = "assets/language-stats.svg";
 
-// 技术栈分类（颜色：每个 stack 一种主色，按使用频率排序）
-// 思路：把语言归并到"技术栈类别"维度，而不是单独列每种语言。
-// 例如：C++ / C# / Java → "C 系 / JVM / 系统级"；HTML / CSS / Vue / TS → "前端 / Web"
-const stackPalette = {
-  "Backend (C# / .NET)": "#178600",
-  "Backend (C++ / Native)": "#f34b7d",
-  "Backend (Java / JVM)": "#b07219",
-  "Frontend (Web)": "#3178c6",
-  "Frontend (Vue)": "#41b883",
-  "Frontend (HTML/CSS)": "#e34c26",
-  "Scripting (Python)": "#3572A5",
-  "Scripting (Shell)": "#89e051",
-  "Scripting (PowerShell)": "#012456",
-  "Scripting (Lua)": "#000080",
-  "Database (SQL)": "#e38c00",
-  "Mobile (Swift/Kotlin/Dart)": "#F05138",
-  "Build (CMake/Docker)": "#9b59b6",
-  "Other": "#656d76",
+// 语言配色（贴近 GitHub Linguist 的常用色）
+const colors = {
+  "C#": "#178600",
+  "C++": "#f34b7d",
+  C: "#555555",
+  "CSS": "#663399",
+  "Dart": "#00B4AB",
+  "Go": "#00ADD8",
+  "HTML": "#e34c26",
+  "Java": "#b07219",
+  "JavaScript": "#f1e05a",
+  "Kotlin": "#a97bff",
+  "Lua": "#000080",
+  "PHP": "#4F5D95",
+  "PowerShell": "#012456",
+  "Python": "#3572A5",
+  "Ruby": "#701516",
+  "Rust": "#dea584",
+  "Shell": "#89e051",
+  "SQL": "#e38c00",
+  "Swift": "#F05138",
+  "TypeScript": "#3178c6",
+  "Vue": "#41b883",
+  "XAML": "#0C54C2",
+  "Dockerfile": "#384d54",
+  "CMake": "#DA3434",
 };
-const fallbackStackColors = ["#8b5cf6", "#06b6d4", "#f97316", "#ec4899", "#84cc16"];
+const fallbackColors = ["#8b5cf6", "#06b6d4", "#f97316", "#ec4899", "#84cc16"];
 
-// 把语言归类到技术栈类别
-const languageToStack = new Map([
-  // C 系 / .NET 后端
-  ["C#", "Backend (C# / .NET)"],
-  ["XAML", "Backend (C# / .NET)"],
-  // C++ / 系统级
-  ["C++", "Backend (C++ / Native)"],
-  ["C", "Backend (C++ / Native)"],
-  // JVM 后端
-  ["Java", "Backend (Java / JVM)"],
-  ["Kotlin", "Backend (Java / JVM)"],
-  // 前端（Web 主体）
-  ["JavaScript", "Frontend (Web)"],
-  ["TypeScript", "Frontend (Web)"],
-  // Vue 框架
-  ["Vue", "Frontend (Vue)"],
-  // 标记语言 / 样式
-  ["HTML", "Frontend (HTML/CSS)"],
-  ["CSS", "Frontend (HTML/CSS)"],
-  // 脚本语言
-  ["Python", "Scripting (Python)"],
-  ["Shell", "Scripting (Shell)"],
-  ["PowerShell", "Scripting (PowerShell)"],
-  ["Lua", "Scripting (Lua)"],
-  // 数据库
-  ["SQL", "Database (SQL)"],
-  // 移动端
-  ["Swift", "Mobile (Swift/Kotlin/Dart)"],
-  ["Dart", "Mobile (Swift/Kotlin/Dart)"],
-  // 构建 / 容器
-  ["CMake", "Build (CMake/Docker)"],
-  ["Dockerfile", "Build (CMake/Docker)"],
-  // 其他独立栈
-  ["Go", "Other"],
-  ["PHP", "Other"],
-  ["Ruby", "Other"],
-  ["Rust", "Other"],
-]);
-
+// 文件后缀 → 语言名（GitHub Linguist 风格）
 const extensionLanguages = new Map([
   [".c", "C"],
   [".cc", "C++"],
@@ -142,29 +112,21 @@ function languageForFile(filename) {
   return extensionLanguages.get(extname(filename).toLowerCase());
 }
 
-// 把语言出现次数累加到技术栈类别
-function collectAdditions(output, stackTotals, languageTotals) {
+// 累加每个 commit 中每个文件的 added 行数到对应语言
+function collectAdditions(output, totals) {
   for (const line of output.split(/\r?\n/)) {
     const [added, , ...filenameParts] = line.split("\t");
     if (!/^\d+$/.test(added) || filenameParts.length === 0) continue;
 
     const language = languageForFile(filenameParts.join("\t"));
     if (!language) continue;
-
-    // 原始语言统计（保留作图例副信息）
-    languageTotals.set(language, (languageTotals.get(language) || 0) + Number(added));
-
-    // 按技术栈聚合
-    const stack = languageToStack.get(language);
-    if (!stack) continue;
-    stackTotals.set(stack, (stackTotals.get(stack) || 0) + Number(added));
+    totals.set(language, (totals.get(language) || 0) + Number(added));
   }
 }
 
 async function calculateContributedLines(commits) {
   const commitsByRepository = new Map();
-  const stackTotals = new Map();
-  const languageTotals = new Map();
+  const totals = new Map();
 
   for (const commit of commits) {
     const repository = commit.repository.full_name;
@@ -181,14 +143,14 @@ async function calculateContributedLines(commits) {
 
       for (const commitSha of commitShas) {
         const output = execFileSync("git", ["-C", repositoryDirectory, "show", "--numstat", "--format=", "--no-renames", commitSha], { encoding: "utf8" });
-        collectAdditions(output, stackTotals, languageTotals);
+        collectAdditions(output, totals);
       }
     }
   } finally {
     await rm(temporaryDirectory, { recursive: true, force: true });
   }
 
-  return { stackTotals, languageTotals };
+  return totals;
 }
 
 function escapeXml(value) {
@@ -200,19 +162,25 @@ function escapeXml(value) {
     .replaceAll("'", "&apos;");
 }
 
-function pickColor(stack, index) {
-  return stackPalette[stack] || fallbackStackColors[index % fallbackStackColors.length];
+function pickColor(language, index) {
+  return colors[language] || fallbackColors[index % fallbackColors.length];
 }
 
-function renderChart(stackEntries, languageBreakdown) {
-  const totalLines = stackEntries.reduce((sum, entry) => sum + entry.lines, 0);
-  const radius = 90;
+// 数字格式：>= 1000 用 k 简写
+function formatLines(n) {
+  if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k`;
+  return String(n);
+}
+
+function renderChart(entries) {
+  const totalLines = entries.reduce((sum, entry) => sum + entry.lines, 0);
+  const radius = 95;
   const strokeWidth = 32;
   const circumference = 2 * Math.PI * radius;
   let offset = 0;
 
-  // 在每个区块首尾各留 2px 缝（按周长比例计算），让相邻区块边界清晰
-  const segments = stackEntries.map((entry, index) => {
+  // 区块之间留 2px 细缝，让边界清晰
+  const segments = entries.map((entry, index) => {
     const length = totalLines ? (entry.lines / totalLines) * circumference : 0;
     const color = pickColor(entry.name, index);
     const gap = totalLines ? (2 / circumference) * circumference : 0;
@@ -222,76 +190,57 @@ function renderChart(stackEntries, languageBreakdown) {
     return segment;
   }).join("\n    ");
 
-  // 主图例：技术栈 + 占比；副信息：包含哪些语言
-  const legend = stackEntries.map((entry, index) => {
+  // 图例：语言名 + 占比 + 代码行数
+  const legend = entries.map((entry, index) => {
     const column = Math.floor(index / 5);
     const row = index % 5;
-    const x = 345 + column * 210;
+    const x = 345 + column * 200;
     const y = 75 + row * 44;
     const color = pickColor(entry.name, index);
     const percentage = totalLines ? (entry.lines / totalLines) * 100 : 0;
-    const childLangs = (languageBreakdown.get(entry.name) || [])
-      .sort((a, b) => b.lines - a.lines)
-      .slice(0, 4)
-      .map((l) => l.name)
-      .join(" · ");
-    const subText = childLangs
-      ? `<text x="22" y="32" class="sub">${escapeXml(childLangs)}</text>`
-      : "";
-    return `<g transform="translate(${x} ${y})"><circle cx="7" cy="-5" r="6" fill="${color}" /><text x="22" class="stack">${escapeXml(entry.name)}</text><text x="22" y="17" class="percentage">${percentage.toFixed(percentage < 1 ? 2 : 1)}%</text>${subText}</g>`;
+    return `<g transform="translate(${x} ${y})"><circle cx="7" cy="-5" r="6" fill="${color}" /><text x="22" class="language">${escapeXml(entry.name)}</text><text x="22" y="17" class="percentage">${percentage.toFixed(percentage < 1 ? 2 : 1)}% · ${formatLines(entry.lines)} lines</text></g>`;
   }).join("\n    ");
 
-  const emptyState = stackEntries.length ? "" : '<text x="180" y="185" text-anchor="middle" class="empty">No contribution data</text>';
+  const emptyState = entries.length ? "" : '<text x="180" y="185" text-anchor="middle" class="empty">No contribution data</text>';
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="820" height="320" viewBox="0 0 820 320" role="img" aria-labelledby="title description">
-  <title id="title">Tech stack breakdown in ${escapeXml(username)}'s contributed code</title>
-  <desc id="description">A donut chart grouping my authored public commits by tech stack category — backend, frontend, scripting, database, mobile, build — measured by added lines of code.</desc>
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="780" height="320" viewBox="0 0 780 320" role="img" aria-labelledby="title description">
+  <title id="title">Languages in ${escapeXml(username)}'s public GitHub projects</title>
+  <desc id="description">A donut chart showing the language composition of ${escapeXml(username)}'s public GitHub projects, measured by added lines of code in authored commits.</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #1f2328; }
     .title { font-size: 18px; font-weight: 600; fill: #1f2328; }
     .percentage { font-size: 12px; fill: #656d76; }
-    .stack { font-size: 14px; font-weight: 600; fill: #1f2328; }
-    .sub { font-size: 11px; fill: #8b949e; }
+    .language { font-size: 14px; font-weight: 600; fill: #1f2328; }
     .count { font-size: 30px; font-weight: 700; fill: #1f2328; }
     .empty { font-size: 13px; fill: #656d76; }
     .track { stroke: #d0d7de; }
     @media (prefers-color-scheme: dark) {
-      .title, .stack, .count { fill: #f0f6fc; }
+      .title, .language, .count { fill: #f0f6fc; }
       .percentage, .empty { fill: #8b949e; }
-      .sub { fill: #6e7681; }
       .track { stroke: #30363d; }
     }
   </style>
-  <text x="24" y="32" class="title">Coding Profile · Tech Stack Share</text>
+  <text x="24" y="32" class="title">Coding Profile · Public Project Languages</text>
   <g transform="rotate(-90 180 180)">
     <circle class="track" cx="180" cy="180" r="${radius}" fill="none" stroke-width="${strokeWidth}" />
     ${segments}
   </g>
   ${emptyState}
-  <text x="180" y="174" text-anchor="middle" class="count">${stackEntries.length}</text>
-  <text x="180" y="196" text-anchor="middle" class="percentage">stacks</text>
+  <text x="180" y="174" text-anchor="middle" class="count">${entries.length}</text>
+  <text x="180" y="196" text-anchor="middle" class="percentage">languages</text>
   ${legend}
 </svg>
 `;
 }
 
 const commits = await getAuthoredCommits();
-const { stackTotals, languageTotals } = await calculateContributedLines(commits);
+const totals = await calculateContributedLines(commits);
 
-// 按技术栈汇总占比，并按数量倒序
-const topStacks = [...stackTotals.entries()]
+// 按语言汇总代码行数并按数量倒序
+const topLanguages = [...totals.entries()]
   .map(([name, lines]) => ({ name, lines }))
   .sort((left, right) => right.lines - left.lines);
 
-// 按语言反查属于哪个 stack（用于副信息展示）
-const languageBreakdown = new Map();
-for (const [language, lines] of languageTotals.entries()) {
-  const stack = languageToStack.get(language);
-  if (!stack) continue;
-  if (!languageBreakdown.has(stack)) languageBreakdown.set(stack, []);
-  languageBreakdown.get(stack).push({ name: language, lines });
-}
-
 await mkdir("assets", { recursive: true });
-await writeFile(outputPath, renderChart(topStacks, languageBreakdown), "utf8");
-console.log(`Updated ${outputPath} from ${commits.length} authored commits across ${topStacks.length} tech stacks.`);
+await writeFile(outputPath, renderChart(topLanguages), "utf8");
+console.log(`Updated ${outputPath} from ${commits.length} authored commits across ${topLanguages.length} languages.`);

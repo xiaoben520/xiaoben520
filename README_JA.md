@@ -10,9 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="./README.md">简体中文</a> ·
-  <a href="./README_EN.md">English</a> ·
-  <a href="./README_JA.md"><strong>日本語</strong></a>
+  <a href="./README.md">简体中文 (CN)</a> ·
+  <a href="./README_EN.md">English (EN)</a> ·
+  <a href="./README_JA.md"><strong>日本語 (JP)</strong></a>
 </p>
 
 <h1 align="center">こんにちは、awaqwq233 です 👋</h1>
