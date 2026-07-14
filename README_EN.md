@@ -2,10 +2,11 @@
 
 <p align="center">
   <img src="./assets/bocchi-banner.jpg" width="100%" alt="Bocchi the Rock! themed profile banner" />
+  <img src="./assets/elaina-banner.jpg" width="100%" alt="Wandering Witch: The Journey of Elaina themed profile banner" />
 </p>
 
 <p align="center">
-  <sub>BOCCHI THE ROCK! © Aki Hamaji / Houbunsha, Aniplex · Image source: <a href="https://anilist.co/anime/130003">AniList</a></sub>
+  <sub>BOCCHI THE ROCK! © Aki Hamaji / Houbunsha, Aniplex · Image source: <a href="https://anilist.co/anime/130003">AniList</a> · Wandering Witch © Jougi Shiraishi / SB Creative · Image source: <a href="https://anilist.co/anime/112609">AniList</a></sub>
 </p>
 
 <p align="center">
@@ -35,9 +36,11 @@
 
 ## About Me
 
-- 🎓 **Current focus:** I'm **awaqwq233** on most platforms, meow. No idea. Backend for now; I can't do algorithms, but apparently I have to become full-stack, meow.
+I'm **awaqwq233** on most platforms, meow.
+
+- 🎓 **Current focus:** No idea. Backend for now; I can't do algorithms, but apparently I have to become full-stack, meow.
 - 🔭 **Working on:** An unpaid internship at a securities company—learning Oracle optimization from scratch, currently in full swing.
-- 🌱 **Next goals:** Can I find a girlfriend? Learn some useful skills? Stay disciplined enough to pass N2 next year? Make everyone happy, meow?
+- 🌱 Next goals: Can I find a girlfriend? Learn some useful skills? Stay disciplined enough to pass N2 next year? Make everyone happy, meow?
 - 💡 **Interested in:** Mysterious indie games, multiplayer games, and going a little feral.
 - 🎯 **Long-term goal:** Make every good person happy, meow.
 - ⚡ **Beyond code:** Eating, drinking, and answering nature's calls.
@@ -85,9 +88,9 @@
 
 | Project | Description | Stack |
 | :--- | :--- | :--- |
-| [Project A](https://github.com/xiaoben520) | `[Explain the problem this project solves in one sentence]` | `[Tech 1]` · `[Tech 2]` |
-| [Project B](https://github.com/xiaoben520) | `[Describe your contribution or the main highlight]` | `[Tech 1]` · `[Tech 2]` |
-| [Project C](https://github.com/xiaoben520) | `[Summarize the outcome in one sentence]` | `[Tech 1]` · `[Tech 2]` |
+| [MemoMind](https://github.com/xiaoben520/Software-Construction-FinalProject-MemoMind) | A Windows desktop app for college students that pairs AI emotional support with smart task management (Software Construction final project). | `C#` · `.NET 8` · `WPF` · `MVVM` · `SQLite` · `EF Core` |
+| [Software-Construction-Weekly-Homework](https://github.com/xiaoben520/Software-Construction-Weekly-Homework) | Weekly assignments for the Spring 2026 Software Construction course. | `C#` · `.NET` |
+| [awaqwq233.github.io](https://github.com/xiaoben520/awaqwq233.github.io) | Awa's little corner of the web (personal site). | `HTML` · `JavaScript` |
 
 ## Blog
 

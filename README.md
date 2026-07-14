@@ -2,10 +2,11 @@
 
 <p align="center">
   <img src="./assets/bocchi-banner.jpg" width="100%" alt="《孤独摇滚！》波奇主题横幅" />
+  <img src="./assets/elaina-banner.jpg" width="100%" alt="《魔女之旅》伊蕾娜主题横幅" />
 </p>
 
 <p align="center">
-  <sub>《孤独摇滚！》© はまじあき／芳文社・アニプレックス · Image source: <a href="https://anilist.co/anime/130003">AniList</a></sub>
+  <sub>《孤独摇滚！》© はまじあき／芳文社・アニプレックス · Image source: <a href="https://anilist.co/anime/130003">AniList</a> · 《魔女之旅》© 白石定規／SB クリエイティブ · Image source: <a href="https://anilist.co/anime/112609">AniList</a></sub>
 </p>
 
 <p align="center">
@@ -35,9 +36,11 @@
 
 ## 关于我
 
-- 🎓 **学习方向：**绝大部分全网 awaqwq233 同名喵，不知道、暂时后端、算法不会、但看起来得干全栈喵
+绝大部分全网 awaqwq233 同名喵
+
+- 🎓 **学习方向：**不知道、暂时后端、算法不会、但看起来得干全栈喵
 - 🔭 **正在进行：**某证券公司欠费实习，从 0 开始学习优化 Oracle 绝赞进行中
-- 🌱 **近期目标：**能找到女朋友吗？学到技巧吗？明年能自律过 N2 吗？能让大家开心吗喵？
+- 🌱 近期目标：能找到女朋友吗？学到技巧吗？明年能自律过 N2 吗？能让大家开心吗喵？
 - 💡 **兴趣领域：**玩神秘独立游戏、联机打游戏、发癫
 - 🎯 **长期目标：**让所有好人幸福喵
 - ⚡ **生活之外：**吃喝拉撒
@@ -85,9 +88,9 @@
 
 | 项目 | 简介 | 技术栈 |
 | :--- | :--- | :--- |
-| [项目名称 A](https://github.com/xiaoben520) | `[一句话说明项目解决了什么问题]` | `[技术 1]` · `[技术 2]` |
-| [项目名称 B](https://github.com/xiaoben520) | `[一句话说明你的主要工作或项目亮点]` | `[技术 1]` · `[技术 2]` |
-| [项目名称 C](https://github.com/xiaoben520) | `[一句话说明项目成果]` | `[技术 1]` · `[技术 2]` |
+| [心安·MemoMind](https://github.com/xiaoben520/Software-Construction-FinalProject-MemoMind) | 面向大学生的 Windows 桌面应用，结合 AI 心理辅助与智能事务管理（软构期末大作业） | `C#` · `.NET 8` · `WPF` · `MVVM` · `SQLite` · `EF Core` |
+| [Software-Construction-Weekly-Homework](https://github.com/xiaoben520/Software-Construction-Weekly-Homework) | 2026 大二下软构课程的每周作业汇总 | `C#` · `.NET` |
+| [awaqwq233.github.io](https://github.com/xiaoben520/awaqwq233.github.io) | awa 的小网站（个人主页） | `HTML` · `JavaScript` |
 
 ## 博客
 

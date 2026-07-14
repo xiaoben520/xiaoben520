@@ -2,10 +2,11 @@
 
 <p align="center">
   <img src="./assets/bocchi-banner.jpg" width="100%" alt="『ぼっち・ざ・ろっく！』後藤ひとりのプロフィールバナー" />
+  <img src="./assets/elaina-banner.jpg" width="100%" alt="『魔女の旅々』イレイナのプロフィールバナー" />
 </p>
 
 <p align="center">
-  <sub>『ぼっち・ざ・ろっく！』© はまじあき／芳文社・アニプレックス · 画像出典：<a href="https://anilist.co/anime/130003">AniList</a></sub>
+  <sub>『ぼっち・ざ・ろっく！』© はまじあき／芳文社・アニプレックス · 画像出典：<a href="https://anilist.co/anime/130003">AniList</a> · 『魔女の旅々』© 白石定規／SB クリエイティブ · 画像出典：<a href="https://anilist.co/anime/112609">AniList</a></sub>
 </p>
 
 <p align="center">
@@ -35,9 +36,11 @@
 
 ## 自己紹介
 
-- 🎓 **学習分野：**ほとんどのサービスで **awaqwq233** という同じ名前を使ってるにゃ。わからない。今のところバックエンド、アルゴリズムはできないけど、どうやらフルスタックをやることになりそうだにゃ。
+ほとんどのサービスで **awaqwq233** という同じ名前を使ってるにゃ。
+
+- 🎓 **学習分野：**わからない。今のところバックエンド、アルゴリズムはできないけど、どうやらフルスタックをやることになりそうだにゃ。
 - 🔭 **現在の活動：**某証券会社で無給インターン中。Oracleの最適化をゼロから学んで絶賛進行中。
-- 🌱 **直近の目標：**彼女はできる？スキルは身につく？来年は自律してN2に合格できる？みんなを笑顔にできるかにゃ？
+- 🌱 直近の目標：彼女はできる？スキルは身につく？来年は自律してN2に合格できる？みんなを笑顔にできるかにゃ？
 - 💡 **興味分野：**謎のインディーゲーム、オンラインゲーム、発狂すること。
 - 🎯 **将来の目標：**すべての善い人を幸せにするにゃ。
 - ⚡ **趣味：**食べる、飲む、排泄する。
@@ -85,9 +88,9 @@
 
 | プロジェクト | 概要 | 技術スタック |
 | :--- | :--- | :--- |
-| [プロジェクト A](https://github.com/xiaoben520) | `[解決した課題を一文で説明]` | `[技術 1]` · `[技術 2]` |
-| [プロジェクト B](https://github.com/xiaoben520) | `[担当したことや主な特徴を一文で説明]` | `[技術 1]` · `[技術 2]` |
-| [プロジェクト C](https://github.com/xiaoben520) | `[成果を一文で説明]` | `[技術 1]` · `[技術 2]` |
+| [MemoMind](https://github.com/xiaoben520/Software-Construction-FinalProject-MemoMind) | 大学生向けWindowsデスクトップアプリ。AIによる心のサポートとスマートなタスク管理を組み合わせたソフトウェア構築コース期末プロジェクト。 | `C#` · `.NET 8` · `WPF` · `MVVM` · `SQLite` · `EF Core` |
+| [Software-Construction-Weekly-Homework](https://github.com/xiaoben520/Software-Construction-Weekly-Homework) | 2026年度後期ソフトウェア構築コースの各週課題まとめ。 | `C#` · `.NET` |
+| [awaqwq233.github.io](https://github.com/xiaoben520/awaqwq233.github.io) | awaの小さなサイト（個人ページ）。 | `HTML` · `JavaScript` |
 
 ## ブログ
 
