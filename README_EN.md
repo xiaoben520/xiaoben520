@@ -35,24 +35,18 @@
 
 ## About Me
 
-<!-- Replace the placeholders below with your own introduction. Feel free to add or remove items. -->
-
-- 🎓 **Current focus:** `[Add your research interests or favorite courses]`
-- 🔭 **Working on:** `[Add what you are currently building or learning]`
-- 🌱 **Next goal:** `[Add a technology or milestone you want to reach soon]`
-- 💡 **Interested in:** `[Add the technical fields that interest you]`
-- 🎯 **Long-term goal:** `[Add your long-term plan]`
-- ⚡ **Beyond code:** `[Add your hobbies or a fun fact]`
-
-> `[Add a sentence that best represents you.]`
+- 🎓 **Current focus:** I'm **awaqwq233** on most platforms, meow. No idea. Backend for now; I can't do algorithms, but apparently I have to become full-stack, meow.
+- 🔭 **Working on:** An unpaid internship at a securities company—learning Oracle optimization from scratch, currently in full swing.
+- 🌱 **Next goals:** Can I find a girlfriend? Learn some useful skills? Stay disciplined enough to pass N2 next year? Make everyone happy, meow?
+- 💡 **Interested in:** Mysterious indie games, multiplayer games, and going a little feral.
+- 🎯 **Long-term goal:** Make every good person happy, meow.
+- ⚡ **Beyond code:** Eating, drinking, and answering nature's calls.
 
 ## Tech Stack
 
 ### Proficient
 
-<!-- Add the core technologies you can confidently use to build projects independently. -->
-
-`[Add your core tech stack]`
+`None`
 
 ### Some Experience
 
@@ -82,12 +76,7 @@
 ## Coding Profile
 
 <p align="center">
-  <img height="280" src="./assets/language-stats.svg" alt="Top ten languages across my public GitHub projects" />
-  <img height="210" src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=xiaoben520&theme=transparent" alt="GitHub statistics" />
-</p>
-
-<p align="center">
-  <sub>The chart measures code in public, non-fork repositories, updates weekly, and displays up to ten languages. It does not indicate proficiency.</sub>
+  <img src="./assets/language-stats.svg" alt="Top ten languages across my public GitHub projects" />
 </p>
 
 ## Projects
