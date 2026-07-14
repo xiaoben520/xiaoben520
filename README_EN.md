@@ -1,9 +1,11 @@
+<h3 align="center">🚧 This profile is still under construction, and some information is incomplete.</h3>
+
 <p align="center">
-  <img src="https://pbs.twimg.com/media/DRCeAV8XUAEyBLG.jpg:large" width="100%" alt="Profile banner illustration" />
+  <img src="./assets/bocchi-banner.jpg" width="100%" alt="Bocchi the Rock! themed profile banner" />
 </p>
 
 <p align="center">
-  <sub>Illustration © lililjiliijili · Source: <a href="https://x.com/lililjiliijili/status/941426073979404288">X Post</a></sub>
+  <sub>BOCCHI THE ROCK! © Aki Hamaji / Houbunsha, Aniplex · Image source: <a href="https://anilist.co/anime/130003">AniList</a></sub>
 </p>
 
 <p align="center">
@@ -80,12 +82,12 @@
 ## Coding Profile
 
 <p align="center">
-  <img height="210" src="https://github-readme-stats.vercel.app/api/top-langs/?username=xiaoben520&layout=donut&langs_count=10&hide_border=true&theme=transparent" alt="Top ten languages on GitHub" />
+  <img height="280" src="./assets/language-stats.svg" alt="Top ten languages across my public GitHub projects" />
   <img height="210" src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=xiaoben520&theme=transparent" alt="GitHub statistics" />
 </p>
 
 <p align="center">
-  <sub>Language statistics are generated from code in public repositories and do not indicate proficiency.</sub>
+  <sub>The chart measures code in public, non-fork repositories, updates weekly, and displays up to ten languages. It does not indicate proficiency.</sub>
 </p>
 
 ## Projects

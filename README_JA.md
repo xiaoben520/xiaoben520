@@ -1,9 +1,11 @@
+<h3 align="center">🚧 このプロフィールは現在作成中で、一部の情報はまだ未完成です。</h3>
+
 <p align="center">
-  <img src="https://pbs.twimg.com/media/DRCeAV8XUAEyBLG.jpg:large" width="100%" alt="プロフィールのバナーイラスト" />
+  <img src="./assets/bocchi-banner.jpg" width="100%" alt="『ぼっち・ざ・ろっく！』後藤ひとりのプロフィールバナー" />
 </p>
 
 <p align="center">
-  <sub>Illustration © lililjiliijili · Source: <a href="https://x.com/lililjiliijili/status/941426073979404288">X Post</a></sub>
+  <sub>『ぼっち・ざ・ろっく！』© はまじあき／芳文社・アニプレックス · 画像出典：<a href="https://anilist.co/anime/130003">AniList</a></sub>
 </p>
 
 <p align="center">
@@ -80,12 +82,12 @@
 ## Coding Profile
 
 <p align="center">
-  <img height="210" src="https://github-readme-stats.vercel.app/api/top-langs/?username=xiaoben520&layout=donut&langs_count=10&hide_border=true&theme=transparent" alt="GitHubで最も使用されている10言語" />
+  <img height="280" src="./assets/language-stats.svg" alt="GitHubの公開プロジェクトで最も使用されている10言語" />
   <img height="210" src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=xiaoben520&theme=transparent" alt="GitHub統計" />
 </p>
 
 <p align="center">
-  <sub>言語グラフは公開リポジトリのコード量から自動生成され、習熟度を表すものではありません。</sub>
+  <sub>グラフは公開されている非Forkリポジトリのコード量を集計し、毎週更新され、最大10言語を表示します。習熟度を表すものではありません。</sub>
 </p>
 
 ## プロジェクト

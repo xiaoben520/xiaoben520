@@ -1,9 +1,11 @@
+<h3 align="center">🚧 还在建设中，部分信息尚未完善。</h3>
+
 <p align="center">
-  <img src="https://pbs.twimg.com/media/DRCeAV8XUAEyBLG.jpg:large" width="100%" alt="个人主页横幅插画" />
+  <img src="./assets/bocchi-banner.jpg" width="100%" alt="《孤独摇滚！》波奇主题横幅" />
 </p>
 
 <p align="center">
-  <sub>Illustration © lililjiliijili · Source: <a href="https://x.com/lililjiliijili/status/941426073979404288">X Post</a></sub>
+  <sub>《孤独摇滚！》© はまじあき／芳文社・アニプレックス · Image source: <a href="https://anilist.co/anime/130003">AniList</a></sub>
 </p>
 
 <p align="center">
@@ -80,12 +82,12 @@
 ## Coding Profile
 
 <p align="center">
-  <img height="210" src="https://github-readme-stats.vercel.app/api/top-langs/?username=xiaoben520&layout=donut&langs_count=10&hide_border=true&theme=transparent" alt="GitHub 使用最多的十种语言" />
+  <img height="280" src="./assets/language-stats.svg" alt="GitHub 公开项目中使用最多的十种语言" />
   <img height="210" src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=xiaoben520&theme=transparent" alt="GitHub 统计数据" />
 </p>
 
 <p align="center">
-  <sub>语言图表根据公开仓库中的代码量自动生成，并不代表实际熟练程度。</sub>
+  <sub>语言图表统计公开、非 Fork 仓库中的代码量，每周自动更新并最多显示十种语言；它并不代表实际熟练程度。</sub>
 </p>
 
 ## 项目
