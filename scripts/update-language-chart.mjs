@@ -1,79 +1,27 @@
-import { execFileSync } from "node:child_process";
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
-import { extname, join } from "node:path";
-import { tmpdir } from "node:os";
+// 自动更新 language-stats.svg
+// 两步查询：1) 通过 commit search 发现所有参与过的公开仓库（含团队协作）
+//           2) 对每个仓库取 languages 字节数并汇总渲染
+// 适用于 CI 环境（使用自动注入的 GITHUB_TOKEN）
+import { mkdir, writeFile } from "node:fs/promises";
 
-const username = process.env.GITHUB_USERNAME || "xiaoben520";
+const username = process.env.GITHUB_USERNAME || process.env.GITHUB_REPOSITORY_OWNER || "xiaoben520";
 const token = process.env.GITHUB_TOKEN;
 const outputPath = "assets/language-stats.svg";
 
-// 语言配色（贴近 GitHub Linguist 的常用色）
+// 语言配色（贴近 GitHub Linguist）
 const colors = {
-  "C#": "#178600",
-  "C++": "#f34b7d",
-  C: "#555555",
-  "CSS": "#663399",
-  "Dart": "#00B4AB",
-  "Go": "#00ADD8",
-  "HTML": "#e34c26",
-  "Java": "#b07219",
-  "JavaScript": "#f1e05a",
-  "Kotlin": "#a97bff",
-  "Lua": "#000080",
-  "PHP": "#4F5D95",
-  "PowerShell": "#012456",
-  "Python": "#3572A5",
-  "Ruby": "#701516",
-  "Rust": "#dea584",
-  "Shell": "#89e051",
-  "SQL": "#e38c00",
-  "Swift": "#F05138",
-  "TypeScript": "#3178c6",
-  "Vue": "#41b883",
-  "XAML": "#0C54C2",
-  "Dockerfile": "#384d54",
-  "CMake": "#DA3434",
+  "C#": "#178600", "C++": "#f34b7d", C: "#555555", "CSS": "#663399",
+  Dart: "#00B4AB", Go: "#00ADD8", HTML: "#e34c26", Java: "#b07219",
+  JavaScript: "#f1e05a", Kotlin: "#a97bff", Lua: "#000080", PHP: "#4F5D95",
+  PowerShell: "#012456", Python: "#3572A5", Ruby: "#701516", Rust: "#dea584",
+  Shell: "#89e051", SQL: "#e38c00", Swift: "#F05138", TypeScript: "#3178c6",
+  Vue: "#41b883", XAML: "#0C54C2", Dockerfile: "#384d54", CMake: "#DA3434",
 };
 const fallbackColors = ["#8b5cf6", "#06b6d4", "#f97316", "#ec4899", "#84cc16"];
 
-// 文件后缀 → 语言名（GitHub Linguist 风格）
-const extensionLanguages = new Map([
-  [".c", "C"],
-  [".cc", "C++"],
-  [".cpp", "C++"],
-  [".cxx", "C++"],
-  [".h", "C++"],
-  [".hh", "C++"],
-  [".hpp", "C++"],
-  [".cs", "C#"],
-  [".css", "CSS"],
-  [".dart", "Dart"],
-  [".go", "Go"],
-  [".htm", "HTML"],
-  [".html", "HTML"],
-  [".java", "Java"],
-  [".js", "JavaScript"],
-  [".jsx", "JavaScript"],
-  [".mjs", "JavaScript"],
-  [".cjs", "JavaScript"],
-  [".kt", "Kotlin"],
-  [".kts", "Kotlin"],
-  [".lua", "Lua"],
-  [".php", "PHP"],
-  [".ps1", "PowerShell"],
-  [".py", "Python"],
-  [".rb", "Ruby"],
-  [".rs", "Rust"],
-  [".scss", "CSS"],
-  [".sh", "Shell"],
-  [".bash", "Shell"],
-  [".sql", "SQL"],
-  [".swift", "Swift"],
-  [".ts", "TypeScript"],
-  [".tsx", "TypeScript"],
-  [".vue", "Vue"],
-  [".xaml", "XAML"],
-]);
+function pickColor(lang, index) {
+  return colors[lang] || fallbackColors[index % fallbackColors.length];
+}
 
 async function github(path) {
   const headers = {
@@ -81,131 +29,91 @@ async function github(path) {
     "User-Agent": `${username}-profile-language-chart`,
     "X-GitHub-Api-Version": "2022-11-28",
   };
-
   if (token) headers.Authorization = `Bearer ${token}`;
 
   const response = await fetch(`https://api.github.com${path}`, { headers });
   if (!response.ok) {
     throw new Error(`GitHub API ${response.status}: ${await response.text()}`);
   }
-
   return response.json();
 }
 
-async function getAuthoredCommits() {
-  const commits = [];
-  const query = encodeURIComponent(`author:${username}`);
+// 通过 commit search 发现所有用户有提交的公开仓库（含 owner + 协作仓库）
+async function discoverAllRepos() {
+  const uniqueRepos = new Map();  // full_name → 保留详情
 
-  for (let page = 1; page <= 10; page += 1) {
-    const result = await github(`/search/commits?q=${query}&sort=author-date&order=desc&per_page=100&page=${page}`);
-    commits.push(...result.items);
-    if (result.items.length < 100) break;
-  }
-
-  return commits;
-}
-
-function languageForFile(filename) {
-  const basename = filename.split("/").at(-1)?.toLowerCase();
-  if (basename === "dockerfile") return "Dockerfile";
-  if (basename === "cmakelists.txt") return "CMake";
-  return extensionLanguages.get(extname(filename).toLowerCase());
-}
-
-// 累加每个 commit 中每个文件的 added 行数到对应语言
-function collectAdditions(output, totals) {
-  for (const line of output.split(/\r?\n/)) {
-    const [added, , ...filenameParts] = line.split("\t");
-    if (!/^\d+$/.test(added) || filenameParts.length === 0) continue;
-
-    const language = languageForFile(filenameParts.join("\t"));
-    if (!language) continue;
-    totals.set(language, (totals.get(language) || 0) + Number(added));
-  }
-}
-
-async function calculateContributedLines(commits) {
-  const commitsByRepository = new Map();
-  const totals = new Map();
-
-  for (const commit of commits) {
-    const repository = commit.repository.full_name;
-    if (!commitsByRepository.has(repository)) commitsByRepository.set(repository, new Set());
-    commitsByRepository.get(repository).add(commit.sha);
-  }
-
-  const temporaryDirectory = await mkdtemp(join(tmpdir(), "language-chart-"));
-
-  try {
-    for (const [repository, commitShas] of commitsByRepository) {
-      const repositoryDirectory = join(temporaryDirectory, repository.replace("/", "--"));
-      execFileSync("git", ["clone", "--quiet", "--no-checkout", `https://github.com/${repository}.git`, repositoryDirectory], { stdio: "inherit" });
-
-      for (const commitSha of commitShas) {
-        const output = execFileSync("git", ["-C", repositoryDirectory, "show", "--numstat", "--format=", "--no-renames", commitSha], { encoding: "utf8" });
-        collectAdditions(output, totals);
-      }
+  // 先拉 owner 仓库（不需要 token，但 token 可提 rate limit）
+  console.log("→ Fetching owner repos…");
+  for (let page = 1; page <= 5; page += 1) {
+    const repos = await github(`/users/${username}/repos?per_page=100&page=${page}&type=owner`);
+    for (const repo of repos) {
+      if (!repo.fork) uniqueRepos.set(repo.full_name, repo);
     }
-  } finally {
-    await rm(temporaryDirectory, { recursive: true, force: true });
+    if (repos.length < 100) break;
   }
 
-  return totals;
+  // 再通过 commit search 发现所有有提交的仓库（包括团队协作项目）
+  // commit search 需要 token；没 token 就只退到 owner repos
+  if (token) {
+    console.log("→ Searching all authored commits to discover collaborative repos…");
+    const query = encodeURIComponent(`author:${username}`);
+    for (let page = 1; page <= 10; page += 1) {
+      const result = await github(`/search/commits?q=${query}&sort=author-date&order=desc&per_page=100&page=${page}`);
+      for (const commit of result.items) {
+        const name = commit.repository.full_name;
+        if (!uniqueRepos.has(name)) {
+          uniqueRepos.set(name, commit.repository);
+        }
+      }
+      if (result.items.length < 100) break;
+    }
+  } else {
+    console.warn("⚠ No GITHUB_TOKEN — only owner repos. Team repos won't be included.");
+  }
+
+  return [...uniqueRepos.values()];
 }
 
 function escapeXml(value) {
   return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&apos;");
+    .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&apos;");
 }
 
-function pickColor(language, index) {
-  return colors[language] || fallbackColors[index % fallbackColors.length];
+function formatBytes(n) {
+  if (n >= 1048576) return `${(n / 1048576).toFixed(1)} MB`;
+  if (n >= 1024) return `${(n / 1024).toFixed(1)} kB`;
+  return `${n} B`;
 }
 
-// 数字格式：>= 1000 用 k 简写
-function formatLines(n) {
-  if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k`;
-  return String(n);
-}
-
-function renderChart(entries) {
-  const totalLines = entries.reduce((sum, entry) => sum + entry.lines, 0);
-  const radius = 95;
-  const strokeWidth = 32;
+function renderChart(entries, repoCount) {
+  const totalBytes = entries.reduce((s, e) => s + e.bytes, 0);
+  const radius = 95, strokeWidth = 32;
   const circumference = 2 * Math.PI * radius;
   let offset = 0;
 
-  // 区块之间留 2px 细缝，让边界清晰
-  const segments = entries.map((entry, index) => {
-    const length = totalLines ? (entry.lines / totalLines) * circumference : 0;
-    const color = pickColor(entry.name, index);
-    const gap = totalLines ? (2 / circumference) * circumference : 0;
-    const segmentLength = Math.max(length - gap, 0);
-    const segment = `<circle cx="180" cy="180" r="${radius}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-dasharray="${segmentLength.toFixed(3)} ${(circumference - segmentLength).toFixed(3)}" stroke-dashoffset="-${offset.toFixed(3)}" />`;
+  const segments = entries.map((entry, i) => {
+    const length = totalBytes ? (entry.bytes / totalBytes) * circumference : 0;
+    const color = pickColor(entry.name, i);
+    const gap = 2;
+    const segLen = Math.max(length - gap, 0);
+    const seg = `<circle cx="180" cy="180" r="${radius}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-dasharray="${segLen.toFixed(3)} ${(circumference - segLen).toFixed(3)}" stroke-dashoffset="-${offset.toFixed(3)}" />`;
     offset += length;
-    return segment;
+    return seg;
   }).join("\n    ");
 
-  // 图例：语言名 + 占比 + 代码行数
-  const legend = entries.map((entry, index) => {
-    const column = Math.floor(index / 5);
-    const row = index % 5;
-    const x = 345 + column * 200;
-    const y = 75 + row * 44;
-    const color = pickColor(entry.name, index);
-    const percentage = totalLines ? (entry.lines / totalLines) * 100 : 0;
-    return `<g transform="translate(${x} ${y})"><circle cx="7" cy="-5" r="6" fill="${color}" /><text x="22" class="language">${escapeXml(entry.name)}</text><text x="22" y="17" class="percentage">${percentage.toFixed(percentage < 1 ? 2 : 1)}% · ${formatLines(entry.lines)} lines</text></g>`;
+  const legend = entries.map((entry, i) => {
+    const col = Math.floor(i / 5), row = i % 5;
+    const x = 345 + col * 220, y = 75 + row * 44;
+    const color = pickColor(entry.name, i);
+    const pct = totalBytes ? (entry.bytes / totalBytes) * 100 : 0;
+    const pctStr = pct < 1 ? `${pct.toFixed(2)}%` : `${pct.toFixed(1)}%`;
+    return `<g transform="translate(${x} ${y})"><circle cx="7" cy="-5" r="6" fill="${color}" /><text x="22" class="language">${escapeXml(entry.name)}</text><text x="22" y="17" class="percentage">${pctStr} · ${formatBytes(entry.bytes)}</text></g>`;
   }).join("\n    ");
-
-  const emptyState = entries.length ? "" : '<text x="180" y="185" text-anchor="middle" class="empty">No contribution data</text>';
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="780" height="320" viewBox="0 0 780 320" role="img" aria-labelledby="title description">
   <title id="title">Languages in ${escapeXml(username)}'s public GitHub projects</title>
-  <desc id="description">A donut chart showing the language composition of ${escapeXml(username)}'s public GitHub projects, measured by added lines of code in authored commits.</desc>
+  <desc id="description">Donut chart of language composition across ${repoCount} public ${repoCount === 1 ? "repo" : "repos"}, measured in bytes of code.</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #1f2328; }
     .title { font-size: 18px; font-weight: 600; fill: #1f2328; }
@@ -225,7 +133,6 @@ function renderChart(entries) {
     <circle class="track" cx="180" cy="180" r="${radius}" fill="none" stroke-width="${strokeWidth}" />
     ${segments}
   </g>
-  ${emptyState}
   <text x="180" y="174" text-anchor="middle" class="count">${entries.length}</text>
   <text x="180" y="196" text-anchor="middle" class="percentage">languages</text>
   ${legend}
@@ -233,14 +140,26 @@ function renderChart(entries) {
 `;
 }
 
-const commits = await getAuthoredCommits();
-const totals = await calculateContributedLines(commits);
+// ── main ──
+const repos = await discoverAllRepos();
+const allRepos = repos.filter((r) => !r.fork);
+const totals = new Map();
 
-// 按语言汇总代码行数并按数量倒序
-const topLanguages = [...totals.entries()]
-  .map(([name, lines]) => ({ name, lines }))
-  .sort((left, right) => right.lines - left.lines);
+for (const repo of allRepos) {
+  const languages = await github(`/repos/${repo.full_name}/languages`);
+  for (const [lang, bytes] of Object.entries(languages)) {
+    totals.set(lang, (totals.get(lang) || 0) + bytes);
+  }
+}
+
+const entries = [...totals.entries()]
+  .map(([name, bytes]) => ({ name, bytes }))
+  .sort((a, b) => b.bytes - a.bytes);
 
 await mkdir("assets", { recursive: true });
-await writeFile(outputPath, renderChart(topLanguages), "utf8");
-console.log(`Updated ${outputPath} from ${commits.length} authored commits across ${topLanguages.length} languages.`);
+await writeFile(outputPath, renderChart(entries, allRepos.length), "utf8");
+
+console.log(`✓ ${outputPath}  ·  ${allRepos.length} repos  ·  ${entries.length} languages`);
+for (const e of entries) {
+  console.log(`  ${e.name}: ${formatBytes(e.bytes)} (${((e.bytes / entries.reduce((s, e) => s + e.bytes, 0)) * 100).toFixed(1)}%)`);
+}
